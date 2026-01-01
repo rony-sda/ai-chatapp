@@ -8,7 +8,8 @@ import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-export function ChatMain() {
+export function ChatMain({session}: {session: any}) {
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -21,7 +22,7 @@ export function ChatMain() {
             <Gift className="size-5" />
           </Button>
           <Avatar className="size-8 ml-1">
-            <AvatarImage src="/logo" />
+            <AvatarImage src={session?.user?.image || '/logo.jpeg'} />
             <AvatarFallback>AI</AvatarFallback>
           </Avatar>
       </header>

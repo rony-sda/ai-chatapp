@@ -6,14 +6,14 @@ import ChatSidebar from "@/module/home/components/chat-sidebar";
 
 
 export default function Home() {
-  const {data} = authClient.useSession()
-  console.log(data)
+  const {data: session} = authClient.useSession()
+
   return (
      <SidebarProvider>
       <div className="flex h-screen w-full bg-background">
-        <div className="max-w-80 w-full overflow-hidden"><ChatSidebar /></div>
+        <div className="max-w-80 w-full overflow-hidden"><ChatSidebar session={session}/></div>
         <main className="flex-1">
-          <ChatMain />
+          <ChatMain session={session} />
         </main>
       </div>
     </SidebarProvider>

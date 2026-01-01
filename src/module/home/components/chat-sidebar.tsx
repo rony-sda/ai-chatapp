@@ -19,11 +19,13 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Image from "next/image"
 import { useTheme } from "next-themes"
+import { authClient } from "@/lib/auth-client"
 
 
- function ChatSidebar () {
+ function ChatSidebar ({session}: {session: any}) {
 
   const { theme, setTheme } = useTheme()
+
 
  if(theme === undefined) return null
  
@@ -123,12 +125,12 @@ import { useTheme } from "next-themes"
 
         <div className="flex items-center gap-3">
           <Avatar className="size-10 rounded-full border-2 border-background ring-1 ring-border">
-            <AvatarImage src="/logo.jpeg" />
+            <AvatarImage src={session?.user?.image || '/logo.jpeg'} />
             <AvatarFallback>EC</AvatarFallback>
           </Avatar>
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-bold truncate">Emilia Caitlin</span>
-            <span className="text-xs text-muted-foreground truncate">hey@unspace.agency</span>
+            <span className="text-sm font-bold truncate">{session?.user.name}</span>
+            <span className="text-xs text-muted-foreground truncate">{session?.user?.email}</span>
           </div>
         </div>
       </SidebarFooter>
