@@ -11,6 +11,7 @@ const AuthLayout = async({children}: Readonly<{
     headers:await headers()
   })
 
+
   if(!session){
     return redirect("/sign-in")
   }

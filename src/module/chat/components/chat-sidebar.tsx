@@ -9,6 +9,8 @@ import {
   HelpCircle,
   Sun,
   Moon,
+  EllipsisIcon,
+  Trash,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -22,17 +24,63 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
+import React, { useMemo, useState } from 'react';
+import { useChatStore } from '../store/chat-store';
+import { getAllChatsType } from '../action';
+import Link from 'next/link';
+import { useDeleteChat } from '../hooks/chat';
+import { toast } from 'sonner';
 
-function ChatSidebar({ session }: { session: any }) {
+interface iAppsProps {
+  session: any;
+  chats: getAllChatsType['data'] | [];
+}
+
+function ChatSidebar({ session, chats }: iAppsProps) {
   const { theme, setTheme } = useTheme();
+  const { activeChatId } = useChatStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { mutateAsync, isPending } = useDeleteChat();
+
+  const filteredChats = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return chats;
+    }
+
+    const query = searchQuery.toLocaleLowerCase();
+
+    return chats?.filter(
+      chat =>
+        chat.title?.toLowerCase().includes(query) ||
+        chat.messages?.some(msg => msg.content?.toLowerCase().includes(query))
+    );
+  }, [chats, searchQuery]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const onDelete = async (e: React.MouseEvent, chatId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const res = await mutateAsync(chatId);
+    if (res.success) toast.success('Chat deleted successfully');
+  };
 
   if (theme === undefined) return null;
-
   return (
     <Sidebar
       variant="inset"
@@ -54,15 +102,22 @@ function ChatSidebar({ session }: { session: any }) {
           <Search className="absolute left-7 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search"
+            value={searchQuery}
+            onChange={handleSearchChange}
             className="pl-9 h-9 bg-muted/50 border-transparent focus-visible:bg-background"
           />
         </div>
 
         <div className="px-4 mb-6">
-          <Button className="w-full justify-start gap-2 bg-primary hover:bg-primary/90 text-foreground border-none h-10 shadow-none">
+          <Link
+            href="/"
+            className={`${buttonVariants({
+              variant: 'default',
+            })} w-full justify-start gap-2 bg-primary hover:bg-primary/90 text-foreground border-none h-10 shadow-none`}
+          >
             <Plus className="size-4" />
             New Chat
-          </Button>
+          </Link>
         </div>
 
         <SidebarGroup>
@@ -72,20 +127,55 @@ function ChatSidebar({ session }: { session: any }) {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="px-2">
-              {[
-                'Marketing Copy for SaaS',
-                'Python Script Debugging',
-                'Product Strategy Sync',
-                'Holiday Trip Planning',
-                'Research on Quantum Computing',
-              ].map((item, i) => (
-                <SidebarMenuItem key={i}>
-                  <SidebarMenuButton className="px-2 py-5 rounded-lg group">
-                    <MessageSquare className="size-4 text-muted-foreground group-hover:text-foreground" />
-                    <span className="truncate text-sm font-medium">{item}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {filteredChats?.length === 0 ? (
+                <div className="px-2 py-5 text-center text-sm text-muted-foreground">
+                  No chats yet
+                </div>
+              ) : (
+                filteredChats?.map((item, i) => (
+                  <SidebarMenuItem key={i}>
+                    <SidebarMenuButton className="px-2 py-5 rounded-lg group">
+                      <Link
+                        href={`/chat/${item.id}`}
+                        className={`${
+                          activeChatId === item.id ? 'bg-sidebar-accent' : ''
+                        } flex items-center justify-between w-full`}
+                      >
+                        <div className="flex flex-1 items-center gap-2">
+                          <MessageSquare className="size-4 text-muted-foreground group-hover:text-foreground" />
+                          <span className="truncate text-sm font-medium">
+                            {item.title.slice(0, 20)}...
+                          </span>
+                        </div>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 group-hover:opacity-100 hover:bg-sidebar-accent-foreground/10"
+                              onClick={e => e.preventDefault()}
+                            >
+                              <EllipsisIcon className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="center">
+                            <DropdownMenuItem
+                              className="flex flex-row gap-2 cursor-pointer"
+                              onClick={e => onDelete(e, item?.id)}
+                            >
+                              <Trash className="h-4 w-4 text-red-500" />
+                              <span className="text-red-500">
+                                {isPending ? 'Deleting...' : 'Delete'}
+                              </span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

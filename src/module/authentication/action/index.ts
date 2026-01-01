@@ -35,3 +35,5 @@ export const currentUser = async () => {
     return null;
   }
 };
+
+export type currentUserType = Awaited<ReturnType<typeof currentUser>>
