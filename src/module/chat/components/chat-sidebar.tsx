@@ -28,12 +28,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
@@ -43,17 +41,20 @@ import { getAllChatsType } from '../action';
 import Link from 'next/link';
 import { useDeleteChat } from '../hooks/chat';
 import { toast } from 'sonner';
+import { currentUserType } from '@/module/authentication/action';
+import { useRouter } from 'next/navigation';
 
 interface iAppsProps {
-  session: any;
+  user: currentUserType;
   chats: getAllChatsType['data'] | [];
 }
 
-function ChatSidebar({ session, chats }: iAppsProps) {
+function ChatSidebar({ user, chats }: iAppsProps) {
   const { theme, setTheme } = useTheme();
-  const { activeChatId } = useChatStore();
+  const { activeChatId , setActiveChatId} = useChatStore();
   const [searchQuery, setSearchQuery] = useState('');
   const { mutateAsync, isPending } = useDeleteChat();
+  const router = useRouter()
 
   const filteredChats = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -79,6 +80,11 @@ function ChatSidebar({ session, chats }: iAppsProps) {
     const res = await mutateAsync(chatId);
     if (res.success) toast.success('Chat deleted successfully');
   };
+
+  const handleNewChat = () => {
+ router.push('/')
+ setActiveChatId(null)
+  }
 
   if (theme === undefined) return null;
   return (
@@ -109,15 +115,13 @@ function ChatSidebar({ session, chats }: iAppsProps) {
         </div>
 
         <div className="px-4 mb-6">
-          <Link
-            href="/"
-            className={`${buttonVariants({
-              variant: 'default',
-            })} w-full justify-start gap-2 bg-primary hover:bg-primary/90 text-foreground border-none h-10 shadow-none`}
+          <Button
+            onClick={handleNewChat}
+            className={`w-full justify-start gap-2 bg-primary hover:bg-primary/90 text-foreground border-none h-10 shadow-none cursor-pointer`}
           >
             <Plus className="size-4" />
             New Chat
-          </Link>
+          </Button>
         </div>
 
         <SidebarGroup>
@@ -134,15 +138,15 @@ function ChatSidebar({ session, chats }: iAppsProps) {
               ) : (
                 filteredChats?.map((item, i) => (
                   <SidebarMenuItem key={i}>
-                    <SidebarMenuButton className="px-2 py-5 rounded-lg group">
+                    <SidebarMenuButton className={` ${
+                          activeChatId === item.id ? 'text-foreground bg-primary' : ''
+                        } px-2 py-5 rounded-lg group`}>
                       <Link
                         href={`/chat/${item.id}`}
-                        className={`${
-                          activeChatId === item.id ? 'bg-sidebar-accent' : ''
-                        } flex items-center justify-between w-full`}
+                        className={`flex items-center justify-between w-full`}
                       >
                         <div className="flex flex-1 items-center gap-2">
-                          <MessageSquare className="size-4 text-muted-foreground group-hover:text-foreground" />
+                          <MessageSquare className={`size-4 text-muted-foreground group-hover:text-foreground`} />
                           <span className="truncate text-sm font-medium">
                             {item.title.slice(0, 20)}...
                           </span>
@@ -227,15 +231,15 @@ function ChatSidebar({ session, chats }: iAppsProps) {
 
         <div className="flex items-center gap-3">
           <Avatar className="size-10 rounded-full border-2 border-background ring-1 ring-border">
-            <AvatarImage src={session?.user?.image || '/logo.jpeg'} />
+            <AvatarImage src={user?.image || '/logo.jpeg'} />
             <AvatarFallback>EC</AvatarFallback>
           </Avatar>
           <div className="flex flex-col min-w-0">
             <span className="text-sm font-bold truncate">
-              {session?.user.name}
+              {user?.name}
             </span>
             <span className="text-xs text-muted-foreground truncate">
-              {session?.user?.email}
+              {user?.email}
             </span>
           </div>
         </div>

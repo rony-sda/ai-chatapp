@@ -30,6 +30,7 @@ import { ModelSelector } from './model-selector';
 import { Spinner } from '@/components/ui/spinner';
 import { useCreateChat } from '../hooks/chat';
 import { toast } from 'sonner';
+import { currentUserType } from '@/module/authentication/action';
 
 const CHAT_TAB_MESSAGE = [
   {
@@ -74,7 +75,11 @@ const CHAT_TAB_MESSAGE = [
   },
 ];
 
-export function ChatMain({ session }: { session: any }) {
+interface iAppProps {
+  user : currentUserType
+}
+
+export function ChatMain({ user }: iAppProps) {
   const { data: models, isPending } = useAIModels();
   const [selectedModel, setSelectedModel] = useState(models?.models[0]?.id);
   console.log(selectedModel)
@@ -136,7 +141,7 @@ export function ChatMain({ session }: { session: any }) {
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar className="size-8 ml-1">
-              <AvatarImage src={session?.user?.image || '/logo.jpeg'} />
+              <AvatarImage src={user?.image || '/logo.jpeg'} />
               <AvatarFallback>AI</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>

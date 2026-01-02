@@ -1,11 +1,15 @@
-import React from 'react';
+import ActiveChatLoader from "@/module/messages/components/active-chat-loader";
+import MessageMain from "@/module/messages/components/message-main";
 
-const page = () => {
-    return (
-        <div>
-            welcome to ai chatapp
-        </div>
-    );
-};
 
-export default page;
+const ChatPage = async({params} : {params: Promise<{chatId: string}>}) => {
+    const {chatId} = await params;
+  return (
+    <>
+    <ActiveChatLoader chatId={chatId}/>
+    <MessageMain chatId={chatId}/>
+    </>
+  )
+}
+
+export default ChatPage

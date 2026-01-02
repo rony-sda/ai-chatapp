@@ -171,3 +171,7 @@ export const deleteChat = async(chatId : string)=>{
 }
 
 export type getAllChatsType = Awaited <ReturnType <typeof getAllChats>>
+export type chatsType = Awaited <ReturnType <typeof getChatById>>
+
+
+

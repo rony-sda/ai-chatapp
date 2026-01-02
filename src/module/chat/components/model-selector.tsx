@@ -23,7 +23,7 @@ import { Model } from "@/app/api/ai/get-models/route";
 
 interface iAppProps {
     models: Model[];
-    selectedModelId: string;
+    selectedModelId: string | undefined;
     onModelSelect: (modelId: string) => void;
     className?: string;
 }
