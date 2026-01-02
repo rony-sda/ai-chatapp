@@ -129,7 +129,7 @@ export function ChatMain({ user }: iAppProps) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full overflow-hidden">
       {/* Header */}
       <header className="h-14 border-b border-border/50 flex items-center justify-end px-6 bg-background/80 backdrop-blur-md z-10 gap-2">
         <Button variant="ghost" size="icon" className="size-9 rounded-full">
@@ -176,7 +176,7 @@ export function ChatMain({ user }: iAppProps) {
         "
                   >
                     {tab.icon}
-                    <span className="font-medium">{tab.tabName}</span>
+                    <span className="font-medium hidden md:block">{tab.tabName}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -192,7 +192,7 @@ export function ChatMain({ user }: iAppProps) {
                           onClick={() => handleMessageSelect(message)}
                           className="w-full text-left py-4 px-2 text-foreground hover:text-foreground/45 transition-colors border-b border-[#2D2438] last:border-none group relative"
                         >
-                          <p className="text-lg font-medium leading-relaxed group-hover:translate-x-1 transition-transform">
+                          <p className="text-sm md:text-lg font-medium leading-relaxed group-hover:translate-x-1 transition-transform">
                             {message}
                           </p>
                         </button>

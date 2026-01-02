@@ -171,10 +171,10 @@ const MessageMain = ({ chatId } : { chatId: string }) => {
   const messageToRender = [...initialMessages, ...messages];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 relative size-full h-[calc(100vh-4rem)]">
-      <div className="flex flex-col h-full">
-        <Conversation className={"h-full"}>
-          <ConversationContent>
+    <div className="max-w-4xl mx-auto p-4 md:p-6 relative w-full h-full min-h-0 overflow-hidden">
+      <div className="flex flex-col h-full min-h-0">
+        <Conversation className={"h-full min-h-0"}>
+          <ConversationContent className="flex-1 min-h-0">
             {messageToRender.length === 0 ? (
               <>
                 <div className="flex items-center justify-center h-full text-gray-500">
@@ -233,7 +233,6 @@ const MessageMain = ({ chatId } : { chatId: string }) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your message..."
-              // disabled={status === "" }
             />
           </PromptInputBody>
           <PromptInputFooter>

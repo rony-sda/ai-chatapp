@@ -23,6 +23,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
@@ -54,7 +56,8 @@ function ChatSidebar({ user, chats }: iAppsProps) {
   const { activeChatId , setActiveChatId} = useChatStore();
   const [searchQuery, setSearchQuery] = useState('');
   const { mutateAsync, isPending } = useDeleteChat();
-  const router = useRouter()
+  const router = useRouter();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const filteredChats = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -82,30 +85,41 @@ function ChatSidebar({ user, chats }: iAppsProps) {
   };
 
   const handleNewChat = () => {
- router.push('/')
- setActiveChatId(null)
-  }
+    router.push('/');
+    setActiveChatId(null);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  const handleChatClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   if (theme === undefined) return null;
   return (
     <Sidebar
       variant="inset"
-      className="border-r border-border/50 w-80  bg-background"
+      className="border-r border-border/50 bg-background w-full md:w-80"
+      collapsible="offcanvas"
     >
       <SidebarHeader className="p-4 flex flex-row items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="rounded-lg flex items-center justify-center gap-2">
-            <Image src={'/logo.png'} alt="Logo" width={40} height={40} />
-            <span className="font-bold text-xl tracking-tight text-foreground">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="rounded-lg flex items-center justify-center gap-2 min-w-0">
+            <Image src={'/logo.png'} alt="Logo" width={40} height={40} className="flex-shrink-0" />
+            <span className="font-bold text-xl tracking-tight text-foreground truncate">
               Ai ChatApp
             </span>
           </div>
         </div>
+        <SidebarTrigger className="md:hidden" />
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="overflow-y-auto">
         <div className="px-4 mb-4 relative">
-          <Search className="absolute left-7 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Search className="absolute left-7 top-1/2 -translate-y-1/2 size-4 text-muted-foreground z-10" />
           <Input
             placeholder="Search"
             value={searchQuery}
@@ -144,6 +158,7 @@ function ChatSidebar({ user, chats }: iAppsProps) {
                       <Link
                         href={`/chat/${item.id}`}
                         className={`flex items-center justify-between w-full`}
+                        onClick={handleChatClick}
                       >
                         <div className="flex flex-1 items-center gap-2">
                           <MessageSquare className={`size-4 text-muted-foreground group-hover:text-foreground`} />

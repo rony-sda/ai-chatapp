@@ -86,7 +86,7 @@ export function ModelSelector({
             <div className="flex items-center gap-1.5 min-w-0">
               <Sparkles className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
               <span className="truncate font-medium">
-                {selectedModel?.name || "Select model"}
+                {selectedModel?.name.slice(0,10) || "Select model"}
               </span>
             </div>
             <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50" />

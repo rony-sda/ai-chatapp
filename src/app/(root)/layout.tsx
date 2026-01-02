@@ -1,4 +1,4 @@
-import { SidebarProvider } from '@/components/ui/sidebar'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { auth } from '@/lib/auth'
 import { currentUser } from '@/module/authentication/action'
 import { getAllChats } from '@/module/chat/action'
@@ -27,16 +27,15 @@ const AuthLayout = async({children}: Readonly<{
   return (
     <>
     <SidebarProvider>
-      <div className="flex h-screen w-full bg-background">
-      <div className="max-w-80 w-full overflow-hidden">
+      <div className="flex h-screen w-full bg-background overflow-hidden">
         <ChatSidebar user={user} chats={chats}/>
-        </div>
-       <main className="flex-1">
-        {children}
-       </main>
-       </div>
-       </SidebarProvider>
- 
+        <SidebarInset className="flex-1 overflow-hidden">
+          <main className="h-full w-full overflow-auto">
+            {children}
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
     </>
   )
 }
