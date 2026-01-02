@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { icons } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +18,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Ai ChatApp",
-  description: "A AI powered chat application.",
+  description: "AI powered chat application.",
+  icons: {
+    icon: '/favicon.png'
+  }
 };
 
 export default function RootLayout({
