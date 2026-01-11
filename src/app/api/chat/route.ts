@@ -232,7 +232,7 @@ export async function POST(req: NextRequest) {
     return new Response(
       JSON.stringify({
         error: "chat_error",
-    message: error.message || "অজানা সমস্যা",
+    message: error.message || "Internal Error",
     friendlyMessage: getFriendlyErrorMessage(error),
     statusCode: error?.statusCode || 500,
       }),
