@@ -46,7 +46,7 @@ const MessageMain = ({ chatId } : { chatId: string }) => {
   const { data: models, isPending: isModelLoading } = useAIModels();
   const { data, isPending } = useGetChatById(chatId);
   const { hasChatBeenTriggered, markChatAsTriggered } = useChatStore();
-
+  const [errorInfo, setErrorInfo] = useState<{ title: string; message: string } | null>(null);
   const [selectedModel, setSelectedModel] = useState(data?.data?.model);
   const [input, setInput] = useState("");
 
@@ -85,7 +85,7 @@ const MessageMain = ({ chatId } : { chatId: string }) => {
       });
   }, [data]);
 
-  const { stop, messages, status, sendMessage, regenerate } = useChat({
+  const { stop, messages, status, sendMessage, regenerate , error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
     }),
@@ -135,6 +135,32 @@ const MessageMain = ({ chatId } : { chatId: string }) => {
     router,
   ]);
 
+ useEffect(() => {
+    if (error) {
+      console.error("Chat error:", error);
+
+      let title = "Error";
+      let message = "Something went wrong. Please try again.";
+
+      try {
+        const errData = (error as any)?.data || {};
+        if (errData.title && errData.message) {
+          title = errData.title;
+          message = errData.message;
+        } else if (error instanceof Error) {
+          const errMsg = error.message.toLowerCase();
+          if (errMsg.includes("rate limit")) {
+            title = "Rate Limit Reached";
+            message = "The model is temporarily rate-limited. Please wait a moment.";
+          } 
+        }
+      } catch {}
+
+      setErrorInfo({ title, message });
+    } else {
+      setErrorInfo(null);
+    }
+  }, [error]);
 
   if (isPending) {
     return (
@@ -175,6 +201,19 @@ const MessageMain = ({ chatId } : { chatId: string }) => {
       <div className="flex flex-col h-full min-h-0">
         <Conversation className={"h-full min-h-0"}>
           <ConversationContent className="flex-1 min-h-0">
+          {errorInfo && (
+              <div className="mx-auto max-w-2xl my-6 p-5 bg-red-950/40 border border-red-800/70 rounded-xl">
+                <div className="text-red-400 font-medium text-lg mb-2">
+                  {errorInfo.title}
+                </div>
+                <div className="text-red-200/90 text-sm">
+                  {errorInfo.message}
+                </div>
+                <div className="mt-4 text-xs opacity-70">
+                  You can try again or select a different model.
+                </div>
+              </div>
+            )}
             {messageToRender.length === 0 ? (
               <>
                 <div className="flex items-center justify-center h-full text-gray-500">
